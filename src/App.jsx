@@ -8,8 +8,16 @@ import { checkWinner, checkEndGame } from './logic/borad';
 
 function App() {
 
-  const [board, setBoard] =  useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(TURNS.X);
+  const [board, setBoard] =  useState(() => {
+    const boardFromStorage = window.localStorage.getItem('board')
+    return boardFromStorage ? JSON.parse(boardFromStorage) : Array(9).fill(null);
+  });
+
+  const [turn, setTurn] = useState(() => {
+    const turnFromStorage = window.localStorage.getItem('turn');
+    return turnFromStorage ?? TURNS.X;
+  });
+
   const [winner, setWinner] = useState(null); // null no hay ganador, false empate 
 
   const updateBoard = (index) => {
@@ -25,6 +33,10 @@ function App() {
     const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X;
     setTurn(newTurn);
 
+    // Guardar la partida
+    window.localStorage.setItem('board', JSON.stringify(newBoard));
+    window.localStorage.setItem('turn', newTurn);
+
     // revisar si hay ganador
     const newWinner = checkWinner(newBoard);
     if(newWinner){
@@ -39,6 +51,9 @@ function App() {
     setBoard(Array(9).fill(null));
     setTurn(TURNS.X);
     setWinner(null);
+
+    window.localStorage.removeItem('board');
+    window.localStorage.removeItem('turn');
   }
 
   return (
